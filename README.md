@@ -3,4 +3,6 @@ Notre projet est un jeu de parcours à obstacle en 2D avec du mouvement dans 4 d
 Diverses fonctionnalitées seront incluses dans le jeu comme un éditeur de niveau.
 
 Par : Nicolas Gagné, Laurent Lepage, Jérôme Bruyère
+
+Anana
 Hiver 2025 - SIM - Bdeb - Projet d'intégration
