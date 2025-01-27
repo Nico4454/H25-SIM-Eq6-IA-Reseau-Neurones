@@ -4,5 +4,4 @@ Diverses fonctionnalitées seront incluses dans le jeu comme un éditeur de nive
 
 Par : Nicolas Gagné, Laurent Lepage, Jérôme Bruyère
 
-Anana
 Hiver 2025 - SIM - Bdeb - Projet d'intégration
