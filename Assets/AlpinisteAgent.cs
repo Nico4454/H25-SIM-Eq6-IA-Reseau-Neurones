@@ -22,18 +22,10 @@ public class AlpinisteAgent : Agent
     private float pos0 = -8f;
     private float largeurNiveau = 15f;
 
-    //UI - text
-    Text texteChargeOver;
-    Transform texteOVerTransform;
-
-
-
     //données pour la physique de l'agent:
-
-    //forceSautMin = chargeMin * multiplicateurSaut
-    private float chargeMax = 3f;
-    private float chargeMin = 1f;
-    private float multiplicateurSaut = 6f;// multiplie la charge pour obtenir la force
+    [SerializeField] private float chargeMax = 2.8f;
+    [SerializeField] private float chargeMin = 1f;
+    [SerializeField] private float multiplicateurSaut = 7f;// multiplie la charge pour obtenir la force
     
     //dt :
     private float dtSaut = 0;
@@ -64,8 +56,6 @@ public class AlpinisteAgent : Agent
     private bool enMouvement;
 
     private bool isHeuristic = false;//important pour savoir si l'agent peut être contrôlé
-
-
 
     Rigidbody2D rBody;
 
@@ -175,6 +165,7 @@ public class AlpinisteAgent : Agent
     }
 
 
+    //GESTION DE L'AGENT CI-DESSOUS :
 
     public override void OnEpisodeBegin()
     {
@@ -185,7 +176,6 @@ public class AlpinisteAgent : Agent
         this.transform.position = new Vector2(departX, departY);
         rBody.linearVelocity = Vector3.zero;
 
-        //génère une position aléatoire pour l'objectif (FACULTATIF??)
 
 
 
