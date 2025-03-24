@@ -46,7 +46,7 @@ public class AlpinisteAgent : Agent
     private float forceSaut;
 
 
-    private float angleSaut = 58.98f * Mathf.Deg2Rad; // deg converti en radians pour faciliter la visualisation
+    private float angleSaut = 48.98f * Mathf.Deg2Rad; // deg converti en radians pour faciliter la visualisation
     private bool orientationVersGauche = false; // si agent orienté vers la gauche ou pas (la droite) pour définir le sens de l'angle
     private float orientation = 1;
 
