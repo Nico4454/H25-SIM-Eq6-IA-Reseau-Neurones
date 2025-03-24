@@ -6,6 +6,7 @@ using Unity.Mathematics;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
+using Unity.MLAgents.Sensors.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -43,7 +44,7 @@ public class AlpinisteAgent : Agent
     private float maxFallingSpeed = 6f;//doit correspondre avec la vitesse de la camera
 
     private float chargeSaut;
-    private float forceSaut;
+    [Observable] private float forceSaut;
 
 
     private float angleSaut = 48.98f * Mathf.Deg2Rad; // deg converti en radians pour faciliter la visualisation
@@ -51,7 +52,7 @@ public class AlpinisteAgent : Agent
     private float orientation = 1;
 
 
-    private bool enSaut;
+    [Observable] private bool enSaut;
     private bool sautEnChargement;
     private bool enMouvement;
 
@@ -72,6 +73,12 @@ public class AlpinisteAgent : Agent
     }
     private void Update()
     {
+        //observations ray
+       
+
+
+
+
         //changer le materiel si au sol ou pas
         if (IsPiedCollisionSol())
         {
@@ -204,9 +211,7 @@ public class AlpinisteAgent : Agent
     {
         sensor.AddObservation(transform.position);
         sensor.AddObservation(objectif.position);
-        //ajouter un raycast peut-être??
-        //ajouter si en saut
-        //ajouter __________
+        sensor.AddObservation(forceSaut);
     }
 
 
@@ -297,7 +302,12 @@ public class AlpinisteAgent : Agent
          * 
          */
         //on modifie le vecteur saut
-        return new Vector2(orientation * forceSaut * Mathf.Cos(angleSaut), forceSaut * Mathf.Sin(angleSaut));
+        return calculerVecteurComposantesAvecAngle(angleSaut, orientation) * forceSaut;
+    }
+
+    private static Vector3 calculerVecteurComposantesAvecAngle(float angle, float orientation)
+    {
+        return new Vector3(orientation * Mathf.Cos(angle), Mathf.Sin(angle)) ;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
