@@ -14,7 +14,7 @@
 venv/
 
 # exclude timers
-assets/ML-Agents/Timers/
+/Assets/ML-Agents/Timers
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
