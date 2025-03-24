@@ -9,6 +9,6 @@ PhysicsMaterial2D:
   m_Name: MatRebond
   serializedVersion: 2
   friction: 0
-  bounciness: 0.9699999
+  bounciness: 0.48
   m_FrictionCombine: 3
   m_BounceCombine: 4
