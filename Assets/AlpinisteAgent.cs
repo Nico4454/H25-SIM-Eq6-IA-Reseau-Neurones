@@ -17,11 +17,20 @@ public class AlpinisteAgent : Agent
     private int numEpisode = 1;
     private bool nouvEpisode = false;
 
+    private float rec = 0f;
 
-    private float departY = -3.381788f;
+
+    private float departY = 0f;
     private float departX;
     private float pos0 = -8f;
     private float largeurNiveau = 15f;
+
+    private float xMax = 12;//-12 à 12
+    private float yMax = 68;
+    
+    //pour les récompenses :
+    private float distanceObjectifAgentMax;
+
 
     //données pour la physique de l'agent:
     [SerializeField] private float chargeMax = 2.8f;
@@ -41,10 +50,10 @@ public class AlpinisteAgent : Agent
 
     //physique de saut :
 
-    private float maxFallingSpeed = 6f;//doit correspondre avec la vitesse de la camera
+    private float vitesseYMax = 8f;//doit correspondre avec la vitesse de la camera
 
     private float chargeSaut;
-    [Observable] private float forceSaut;
+    private float forceSaut;
 
 
     private float angleSaut = 48.98f * Mathf.Deg2Rad; // deg converti en radians pour faciliter la visualisation
@@ -52,7 +61,7 @@ public class AlpinisteAgent : Agent
     private float orientation = 1;
 
 
-    [Observable] private bool enSaut;
+    private bool enSaut;
     private bool sautEnChargement;
     private bool enMouvement;
 
@@ -70,13 +79,18 @@ public class AlpinisteAgent : Agent
         rBody.sharedMaterial = matPasRebond;
         chargeSaut = chargeMin;
         dtRetourSol = dtRetourSolMin + 1;
+        calculDistanceMax();
+
     }
+
+    private void calculDistanceMax()
+    {
+        Vector2 vecteurDistance = (objectif.position - new Vector3(0, departY, transform.position.z));
+        distanceObjectifAgentMax = vecteurDistance.magnitude;
+    }
+
     private void Update()
     {
-        //observations ray
-       
-
-
 
 
         //changer le materiel si au sol ou pas
@@ -93,7 +107,7 @@ public class AlpinisteAgent : Agent
         //en tombant, il ne faut pas que la vitesse soit trop élevée
         if (rBody.linearVelocityY < 0.1f)
         {
-            rBody.linearVelocityY = Mathf.Clamp(rBody.linearVelocityY, -maxFallingSpeed, 0);
+            rBody.linearVelocityY = Mathf.Clamp(rBody.linearVelocityY, -vitesseYMax, 0);
         }
 
         //indiquer l'orientation gauche/droite
@@ -160,7 +174,7 @@ public class AlpinisteAgent : Agent
 
             }
             chargerSaut();
-            Debug.Log(chargeSaut);
+            Debug.Log("chargeSaut: "+chargeSaut + "recompense : "+rec );
         }
 
 
@@ -209,9 +223,13 @@ public class AlpinisteAgent : Agent
     }
     public override void CollectObservations(VectorSensor sensor)
     {
-        sensor.AddObservation(transform.position);
+        sensor.AddObservation(transform.position.x /xMax );
+        sensor.AddObservation(transform.position.y /yMax );
+
         sensor.AddObservation(objectif.position);
-        sensor.AddObservation(forceSaut);
+
+        sensor.AddObservation(rBody.linearVelocityX/vitesseX);
+        sensor.AddObservation(rBody.linearVelocityY / vitesseYMax);
     }
 
 
@@ -257,7 +275,16 @@ public class AlpinisteAgent : Agent
             forceSaut = calculerForceSaut();
             sauter();
         }
-
+        //on veut calculer la récompense à donner en fonction de la distance de l'agent avec l'objectif
+      
+        Vector2 deltaObjectifAgent = (objectif.position - transform.position);
+        float distanceObjectifAgent = deltaObjectifAgent.magnitude;
+        float recompenseDistance = (distanceObjectifAgentMax - distanceObjectifAgent) / distanceObjectifAgentMax + 0.1f;
+        if (recompenseDistance > 0 && recompenseDistance < 1)
+        {
+            SetReward(recompenseDistance);//plus l'agent se rapproche de l'objectif, plus il sera récompensé mais toujours entre 0 et 1
+            rec = recompenseDistance;
+        }
 
 
 
@@ -315,6 +342,7 @@ public class AlpinisteAgent : Agent
         if (other.gameObject.name == "Objectif")
         {
             SetReward(1f);
+            rec= 1f;
             EndEpisode();
         }
         if (other.gameObject.name == "Bordure")

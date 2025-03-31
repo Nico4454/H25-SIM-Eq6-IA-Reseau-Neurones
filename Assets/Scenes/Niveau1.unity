@@ -8559,7 +8559,7 @@ Transform:
   m_GameObject: {fileID: 427126860}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 0, y: 2.6799998, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -8623,7 +8623,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   transformAgent: {fileID: 2124860187}
   dyExtra: 3
-  vitesseCamera: 6
+  vitesseCamera: 8
 --- !u!1 &485728539
 GameObject:
   m_ObjectHideFlags: 0
@@ -8908,7 +8908,7 @@ Transform:
   m_GameObject: {fileID: 610062978}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.92, y: 48.03, z: 0.10916856}
+  m_LocalPosition: {x: -6.92, y: 51.05, z: 0.10916856}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9050,7 +9050,7 @@ Transform:
   m_GameObject: {fileID: 619394800}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 3.0200005, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9178,7 +9178,7 @@ Transform:
   m_GameObject: {fileID: 646805640}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.63, y: 2.34, z: -10}
+  m_LocalPosition: {x: -0.63, y: 5.36, z: -10}
   m_LocalScale: {x: 1.51, y: 3.95, z: 1.6772008}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9269,7 +9269,7 @@ Transform:
   m_GameObject: {fileID: 692484032}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.9, y: -8.28, z: 0.10916856}
+  m_LocalPosition: {x: -1.9, y: -5.2599993, z: 0.10916856}
   m_LocalScale: {x: 100, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9356,7 +9356,7 @@ Transform:
   m_GameObject: {fileID: 830786291}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.2495, y: 26.64, z: 0}
+  m_LocalPosition: {x: -0.2495, y: 29.66, z: 0}
   m_LocalScale: {x: 2.1245272, y: 4.4740133, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9400,7 +9400,7 @@ Transform:
   m_GameObject: {fileID: 1540409072}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.54, y: 0, z: 0}
+  m_LocalPosition: {x: 0.54, y: 3.0200005, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -9626,7 +9626,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 6
+    VectorObservationSize: 7
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 1
@@ -9637,7 +9637,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 0}
   m_InferenceDevice: 0
-  m_BehaviorType: 1
+  m_BehaviorType: 0
   m_BehaviorName: BehaviorAlpiniste
   TeamId: 0
   m_UseChildSensors: 1
@@ -9818,7 +9818,7 @@ Transform:
   m_GameObject: {fileID: 2124860180}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.7, y: -2.77, z: 0}
+  m_LocalPosition: {x: 4.8, y: 0, z: 0}
   m_LocalScale: {x: 0.42, y: 0.42, z: 0.42}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -9840,8 +9840,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_SensorName: RayPerceptionSensor
   m_DetectableTags: []
-  m_RaysPerDirection: 4
-  m_MaxRayDegrees: 90
+  m_RaysPerDirection: 2
+  m_MaxRayDegrees: 70
   m_SphereCastRadius: 0.71
   m_RayLength: 24
   m_RayLayerMask:
