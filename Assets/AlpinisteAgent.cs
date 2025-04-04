@@ -17,7 +17,6 @@ public class AlpinisteAgent : Agent
     private int numEpisode = 1;
     private bool nouvEpisode = false;
 
-    private float rec = 0f;
 
 
     private float departY = 0f;
@@ -30,6 +29,9 @@ public class AlpinisteAgent : Agent
     
     //pour les récompenses :
     private float distanceObjectifAgentMax;
+    private float hauteurMaxAtteinte = 0f;
+    private Vector3 deltaObjectifAgent;
+
 
 
     //données pour la physique de l'agent:
@@ -73,25 +75,29 @@ public class AlpinisteAgent : Agent
     [SerializeField] PhysicsMaterial2D matRebond;
     [SerializeField] PhysicsMaterial2D matPasRebond;
 
+    [SerializeField] SpriteRenderer fond;
+
     void Start()
     {
         rBody = this.GetComponent<Rigidbody2D>();
         rBody.sharedMaterial = matPasRebond;
         chargeSaut = chargeMin;
         dtRetourSol = dtRetourSolMin + 1;
-        calculDistanceMax();
+        
 
     }
 
     private void calculDistanceMax()
     {
         Vector2 vecteurDistance = (objectif.position - new Vector3(0, departY, transform.position.z));
-        distanceObjectifAgentMax = vecteurDistance.magnitude;
+        distanceObjectifAgentMax = vecteurDistance.y;
     }
 
     private void Update()
     {
-
+        calculDistanceMax();
+        
+        hauteurMaxAtteinte = Mathf.Max(transform.position.y,hauteurMaxAtteinte);
 
         //changer le materiel si au sol ou pas
         if (IsPiedCollisionSol())
@@ -173,10 +179,11 @@ public class AlpinisteAgent : Agent
                 sautEnChargement = false;
 
             }
-            chargerSaut();
-            Debug.Log("chargeSaut: "+chargeSaut + "recompense : "+rec );
+            chargerSaut();            
+
         }
 
+        Debug.Log("Episode: " + CompletedEpisodes);
 
 
         //pour voir l'angle et la direction du saut
@@ -190,6 +197,7 @@ public class AlpinisteAgent : Agent
 
     public override void OnEpisodeBegin()
     {
+        //fond.color = Color.clear;
         nouvEpisode = true;
         numEpisode++;
         //génère une position aléatoire de l'agent au début de chaque épisode
@@ -197,11 +205,13 @@ public class AlpinisteAgent : Agent
         this.transform.position = new Vector2(departX, departY);
         rBody.linearVelocity = Vector3.zero;
 
-
-
+        
+        
 
 
     }
+    
+    
     public override void Heuristic(in ActionBuffers actionsOut)//quand on peut contrôler l'agent par nous-même
     {
         isHeuristic = true;
@@ -221,15 +231,18 @@ public class AlpinisteAgent : Agent
 
 
     }
+
+    //fait 9 observations
     public override void CollectObservations(VectorSensor sensor)
     {
-        sensor.AddObservation(transform.position.x /xMax );
-        sensor.AddObservation(transform.position.y /yMax );
+        sensor.AddObservation(transform.position);// 3 observations
+        sensor.AddObservation(objectif.position);// 3 observations
 
-        sensor.AddObservation(objectif.position);
+        sensor.AddObservation(rBody.linearVelocityX);//2
+        sensor.AddObservation(rBody.linearVelocityY);
 
-        sensor.AddObservation(rBody.linearVelocityX/vitesseX);
-        sensor.AddObservation(rBody.linearVelocityY / vitesseYMax);
+        sensor.AddObservation(forceSaut);//1
+        sensor.AddObservation(deltaObjectifAgent);
     }
 
 
@@ -275,15 +288,22 @@ public class AlpinisteAgent : Agent
             forceSaut = calculerForceSaut();
             sauter();
         }
+
         //on veut calculer la récompense à donner en fonction de la distance de l'agent avec l'objectif
-      
-        Vector2 deltaObjectifAgent = (objectif.position - transform.position);
-        float distanceObjectifAgent = deltaObjectifAgent.magnitude;
-        float recompenseDistance = (distanceObjectifAgentMax - distanceObjectifAgent) / distanceObjectifAgentMax + 0.1f;
+        deltaObjectifAgent = (objectif.position - transform.position);
+        float distanceObjectifAgent = deltaObjectifAgent.y;
+        float recompenseDistance = 0;
+        if (transform.position.y > 0.5f)
+        {
+            recompenseDistance = (distanceObjectifAgentMax - distanceObjectifAgent) / distanceObjectifAgentMax + 0.1f;
+        }
+        if (hauteurMaxAtteinte > transform.position.y)
+        {
+            AddReward((transform.position.y - hauteurMaxAtteinte) / (hauteurMaxAtteinte - 0.01f) );
+        }
         if (recompenseDistance > 0 && recompenseDistance < 1)
         {
             SetReward(recompenseDistance);//plus l'agent se rapproche de l'objectif, plus il sera récompensé mais toujours entre 0 et 1
-            rec = recompenseDistance;
         }
 
 
@@ -342,7 +362,7 @@ public class AlpinisteAgent : Agent
         if (other.gameObject.name == "Objectif")
         {
             SetReward(1f);
-            rec= 1f;
+            //fond.color = Color.green;
             EndEpisode();
         }
         if (other.gameObject.name == "Bordure")
