@@ -7,6 +7,7 @@ using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 using Unity.MLAgents.Sensors.Reflection;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -31,7 +32,9 @@ public class AlpinisteAgent : Agent
     private float distanceObjectifAgentMax;
     private float hauteurMaxAtteinte = 0f;
     private Vector3 deltaObjectifAgent;
+    private float distancePalier = 2;
 
+    private float rec = 0;
 
 
     //données pour la physique de l'agent:
@@ -183,12 +186,17 @@ public class AlpinisteAgent : Agent
 
         }
 
-        Debug.Log("Episode: " + CompletedEpisodes);
+        Debug.Log("Episode: " + CompletedEpisodes + "rec: "+rec);
 
 
         //pour voir l'angle et la direction du saut
 
         Debug.DrawRay(transform.position, calculerVecteurSaut(calculerForceSaut()), Color.red);
+
+
+        
+
+
 
     }
 
@@ -204,7 +212,7 @@ public class AlpinisteAgent : Agent
         departX = randomDebutX();
         this.transform.position = new Vector2(departX, departY);
         rBody.linearVelocity = Vector3.zero;
-
+        hauteurMaxAtteinte = departY;
         
         
 
@@ -232,7 +240,7 @@ public class AlpinisteAgent : Agent
 
     }
 
-    //fait 9 observations
+    //fait 11 observations
     public override void CollectObservations(VectorSensor sensor)
     {
         sensor.AddObservation(transform.position);// 3 observations
@@ -241,8 +249,11 @@ public class AlpinisteAgent : Agent
         sensor.AddObservation(rBody.linearVelocityX);//2
         sensor.AddObservation(rBody.linearVelocityY);
 
-        sensor.AddObservation(forceSaut);//1
-        sensor.AddObservation(deltaObjectifAgent);
+        sensor.AddObservation(forceSaut);//3
+        sensor.AddObservation(enSaut);
+        sensor.AddObservation(orientation);
+
+        //sensor.AddObservation(deltaObjectifAgent);
     }
 
 
@@ -290,21 +301,62 @@ public class AlpinisteAgent : Agent
         }
 
         //on veut calculer la récompense à donner en fonction de la distance de l'agent avec l'objectif
-        deltaObjectifAgent = (objectif.position - transform.position);
-        float distanceObjectifAgent = deltaObjectifAgent.y;
+        deltaObjectifAgent = (objectif.position - transform.position);//obtient un vecteur de delta position
+        float distanceObjectifAgent = (deltaObjectifAgent.y);
         float recompenseDistance = 0;
-        if (transform.position.y > 0.5f)
+        if (distanceObjectifAgent < distanceObjectifAgentMax*0.98)
         {
-            recompenseDistance = (distanceObjectifAgentMax - distanceObjectifAgent) / distanceObjectifAgentMax + 0.1f;
+             recompenseDistance = (distanceObjectifAgentMax - Mathf.Abs(distanceObjectifAgent)) / distanceObjectifAgentMax;
         }
-        if (hauteurMaxAtteinte > transform.position.y)
+        if (Mathf.Abs(distanceObjectifAgent) > 0.01f)//pas trop proche de l'objectif
         {
-            AddReward((transform.position.y - hauteurMaxAtteinte) / (hauteurMaxAtteinte - 0.01f) );
+            if (distanceObjectifAgent > 0.1f && recompenseDistance < 1)
+            {
+                SetReward(recompenseDistance);
+                rec = recompenseDistance;
+            } else if (distanceObjectifAgent < 0)//si plus haut agent plus haut que l'objectif
+            {
+                float punitionDistance = Mathf.Abs(distanceObjectifAgent) / distanceObjectifAgentMax;
+
+                SetReward(0);
+            }
         }
-        if (recompenseDistance > 0 && recompenseDistance < 1)
-        {
-            SetReward(recompenseDistance);//plus l'agent se rapproche de l'objectif, plus il sera récompensé mais toujours entre 0 et 1
-        }
+
+        //if (transform.position.y > 0.5f)
+        //{
+        //    recompenseDistance = (distanceObjectifAgentMax - distanceObjectifAgent) / distanceObjectifAgentMax + 0.1f;
+        //}
+        //if (hauteurMaxAtteinte > transform.position.y)
+        //{
+        //    AddReward((transform.position.y - hauteurMaxAtteinte) / (hauteurMaxAtteinte - 0.01f));
+        //}
+        //if (recompenseDistance > 0 && recompenseDistance < 1)
+        //{
+        //    SetReward(recompenseDistance);//plus l'agent se rapproche de l'objectif, plus il sera récompensé mais toujours entre 0 et 1
+        //}
+
+
+
+
+
+        /**
+         * On veut récompenser à chaque fois que l'agent dépasse un certain palier et reste au dessus
+         * exemple, chaque 2 métres on ajoute 0.1 de recompenses
+         * 1 palier = x m de parcouru (x = distance palier)
+         */
+        //float recompensePalier = distancePalier / distanceObjectifAgentMax;
+        //if (((transform.position.y - departY) % distancePalier) == 0 && transform.position.y >= hauteurMaxAtteinte )        //atteint une nouvelle hauteur maximum et la hauteur est divisible par le palier donc a atteint le palier
+        //{
+        //    AddReward(recompensePalier);
+        //    rec += recompensePalier;
+
+
+
+
+        //}
+
+
+
 
 
 
