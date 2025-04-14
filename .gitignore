@@ -14,7 +14,8 @@
 venv/
 
 # exclude timers
-/Assets/ML-Agents/Timers
+/Assets/ML-Agents/Timers/
+/results/ignore-results
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
@@ -77,6 +78,4 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
-Assets/ML-Agents/Timers/Niveau1_timers.json
-/results/ignore-results
-Assets/ML-Agents/Timers/Niveau1_timers.json
+
