@@ -12,27 +12,20 @@ behaviors:
       learning_rate_schedule: linear
     network_settings:
       normalize: false
-      hidden_units: 256
-      num_layers: 2
+      hidden_units: 512
+      num_layers: 3
       vis_encode_type: simple
+      memory:
+        sequence_length: 64
+        memory_size: 256
     reward_signals:
       extrinsic:
         gamma: 0.99
         strength: 1.0
-      gail:
+      curiosity:
+        strength: 0.05
         gamma: 0.99
-        strength: 0.03
         learning_rate: 0.0003
-        use_actions: false
-        use_vail: false
-        demo_path: Demos\Alpinistedemo2.demo
-    behavioral_cloning:
-      demo_path: Demos\Alpinistedemo2.demo
-      strength: 0.5
-      steps: 150000
-      samples_per_update: 0
-      batch_size: 512
-      num_epoch: 3
     keep_checkpoints: 5
     max_steps: 5000000
     time_horizon: 128

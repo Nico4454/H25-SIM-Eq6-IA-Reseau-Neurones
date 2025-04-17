@@ -21,6 +21,7 @@ using UnityEngine.UIElements;
 public class AlpinisteAgent : Agent
 {
     private bool nouvEpisode = false;
+    private bool decisionPossible = false;
 
     //pour le depart
     private float departY = 0f;
@@ -88,7 +89,8 @@ public class AlpinisteAgent : Agent
     }
     private void FixedUpdate()
     {
-        if ( (IsPiedCollisionSol() && rBody.linearVelocityY <= 0) || (!enSaut && !sautEnChargement) )//quand au sol on demande une decision
+        bool decisionPossible = (IsPiedCollisionSol() && rBody.linearVelocityY <= 0);
+        if ( decisionPossible )//quand au sol on demande une decision
         {
             RequestDecision();
         }
@@ -223,11 +225,12 @@ public class AlpinisteAgent : Agent
         sensor.AddObservation(transform.position);// 3 observations
         sensor.AddObservation(objectif.position);// 3 observations
 
-        sensor.AddObservation(rBody.linearVelocityX/vitesseX);//2
-        sensor.AddObservation(rBody.linearVelocityY/vitesseYMax);
+        sensor.AddObservation(rBody.linearVelocityX);//2
+        sensor.AddObservation(rBody.linearVelocityY);
 
         sensor.AddObservation(forceSaut);
         sensor.AddObservation(orientation);
+        sensor.AddObservation(decisionPossible);
 
     }
 
@@ -300,7 +303,7 @@ public class AlpinisteAgent : Agent
             EndEpisode();
         }
         //on set la récompense à la bonne valeur
-        if (recompenseDistance < 1) setRecompense(recompenseDistance - penalite);//plus on s'approche de l'objectif plus la récompense est élevé
+        if (recompenseDistance < 1) setRecompense(recompenseDistance);//plus on s'approche de l'objectif plus la récompense est élevé
 
 
 
@@ -357,6 +360,10 @@ public class AlpinisteAgent : Agent
         SetReward(recompense);
         this.recompense = recompense;
         //recompenseMax = Mathf.Max(recompenseMax, this.recompense );
+        if (recompense <= -1f)
+        {
+            EndEpisode();
+        }
     }
 
     private void calculDistanceMax()
