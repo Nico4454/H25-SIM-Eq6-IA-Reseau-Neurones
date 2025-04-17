@@ -1,4 +1,6 @@
 using System;
+using Unity.Sentis;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -8,4 +10,10 @@ public class ChargementScene: MonoBehaviour
     {
         SceneManager.LoadScene(scene);
     }
+
+    public void activerBoutonsCerveau()
+    {
+        
+    }
+    
 }
