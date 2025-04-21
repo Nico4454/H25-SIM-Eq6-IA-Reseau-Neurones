@@ -1,21 +1,11 @@
 using System;
-using System.Linq;
-using System.Runtime.InteropServices;
-using TMPro;
-using Unity.Collections;
-using Unity.Mathematics;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Policies;
 using Unity.MLAgents.Sensors;
-using Unity.MLAgents.Sensors.Reflection;
 using Unity.Sentis;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.Rendering.RenderGraphModule;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
+
 
 
 public class AlpinisteAgent : Agent
@@ -34,8 +24,15 @@ public class AlpinisteAgent : Agent
     private float hauteurMaxAtteinte = 0f;
     private Vector3 deltaObjectifAgent;
     private float recompense = 0;
+    private float dHauteurMax = 5f;
 
-    private float penalite=0;
+    private float recompenseMax = 0;
+
+    private float palier = 1f;
+    private int dernierPalier = 0;
+    private int palierActuel = 0;
+    private int palierMax;
+
 
 
     //dt :
@@ -53,7 +50,7 @@ public class AlpinisteAgent : Agent
     [SerializeField] private float chargeMax = 3f;
     [SerializeField] private float chargeMin = 1f;
     [SerializeField] private float multiplicateurSaut = 7f;// multiplie la charge pour obtenir la force
-    
+
     private float vitesseX = 3f;
     private float vitesseYMax = 8f;//doit correspondre avec la vitesse de la camera
 
@@ -67,7 +64,7 @@ public class AlpinisteAgent : Agent
     private bool enSaut;
     private bool sautEnChargement;
     private bool enMouvement;
-   
+
     //heuristic
     private bool isHeuristic = false;//important pour savoir si l'agent peut être contrôlé
 
@@ -77,7 +74,12 @@ public class AlpinisteAgent : Agent
     //matériaux
     [SerializeField] PhysicsMaterial2D matRebond;
     [SerializeField] PhysicsMaterial2D matPasRebond;
-    private bool enInference;
+
+    private bool toucheG = false;
+    private bool toucheD = false;
+    private bool toucheSaut = false;
+
+    
 
     void Start()
     {
@@ -85,27 +87,33 @@ public class AlpinisteAgent : Agent
         rBody.sharedMaterial = matPasRebond;
         chargeSaut = chargeMin;
         dtRetourSol = dtRetourSolMin + 1;
-        
+
     }
     private void FixedUpdate()
     {
         bool decisionPossible = (IsPiedCollisionSol() && rBody.linearVelocityY <= 0);
-        if ( decisionPossible )//quand au sol on demande une decision
+        if (decisionPossible)//quand au sol on demande une decision
         {
             RequestDecision();
+
         }
+
     }
 
 
     private void Update()
     {
+        //pour les récompenses
+        deltaObjectifAgent = (objectif.position - transform.position);//obtient un vecteur de delta position
+        float distanceObjectifAgent = deltaObjectifAgent.y;
+        palierActuel = palierMax - Mathf.FloorToInt(distanceObjectifAgent / palier);
+
         hauteurMaxAtteinte = Mathf.Max(transform.position.y, hauteurMaxAtteinte);
 
         //changer le materiel si au sol ou pas
         if (IsPiedCollisionSol())
         {
             rBody.sharedMaterial = matPasRebond;
-
         }
         else
         {
@@ -131,7 +139,7 @@ public class AlpinisteAgent : Agent
             this.gameObject.GetComponent<SpriteRenderer>().flipX = false;
 
         }
-        
+
 
         if (dtSaut < dtSautMin && enSaut && dtRetourSol >= dtRetourSolMin)//maintenir la vitesse en x quand trop prêt du sol pour éviter un frottement 
         {
@@ -181,7 +189,7 @@ public class AlpinisteAgent : Agent
                 sautEnChargement = false;
 
             }
-            
+
             chargerSaut();
 
         }
@@ -203,9 +211,9 @@ public class AlpinisteAgent : Agent
 
     public override void OnEpisodeBegin()
     {
-        penalite = 0;
         recompense = 0;
-
+        palierActuel = 0;
+        dernierPalier = 0;
         nouvEpisode = true;
         //génère une position aléatoire de l'agent au début de chaque épisode
         departX = randomDebutX();
@@ -213,11 +221,13 @@ public class AlpinisteAgent : Agent
         rBody.linearVelocity = Vector3.zero;
         hauteurMaxAtteinte = departY;
         calculDistanceMax();
+        palierMax = Mathf.FloorToInt(distanceObjectifAgentMax / palier) + 1;
+
 
 
 
     }
-    
+
 
 
     public override void CollectObservations(VectorSensor sensor)
@@ -225,29 +235,47 @@ public class AlpinisteAgent : Agent
         sensor.AddObservation(transform.position);// 3 observations
         sensor.AddObservation(objectif.position);// 3 observations
 
-        sensor.AddObservation(rBody.linearVelocityX);//2
-        sensor.AddObservation(rBody.linearVelocityY);
+        sensor.AddObservation(rBody.linearVelocityX / (chargeMax * multiplicateurSaut * Mathf.Cos(angleSaut)));//2
+        sensor.AddObservation(rBody.linearVelocityY / (chargeMax * multiplicateurSaut * Mathf.Sin(angleSaut)));
 
-        sensor.AddObservation(forceSaut);
         sensor.AddObservation(orientation);
         sensor.AddObservation(decisionPossible);
+        sensor.AddObservation(enSaut);
 
     }
 
 
     public override void OnActionReceived(ActionBuffers actions)
     {
-
+        
 
         float moveX = 0;
         switch (actions.DiscreteActions[0])
         {//donne la direction du mouvement en x
-            case 0: moveX = -1; break;
-            case 1: moveX = 0; break;
-            case 2: moveX = 1; break;
+            case 0:
+                {
+                    moveX = -1;
+                    toucheG = true;
+                    toucheD = false;
+                    break;
+                }
+            case 1: 
+                { 
+                    moveX = 0;
+                    toucheG = false;
+                    toucheD = false;
+                    break;
+                }
+            case 2:
+                {
+                    moveX = 1;
+                    toucheG = false;
+                    toucheD = true;
+                    break;
+                }
         }
         enMouvement = (moveX != 0);
-        
+
         if (!enSaut && !sautEnChargement)//si l'agent tombe sans avoir sauté il peut bougé
         {
             rBody.linearVelocityX = moveX * vitesseX;
@@ -255,6 +283,8 @@ public class AlpinisteAgent : Agent
         }
         var actionChargement = ScaleAction(actions.ContinuousActions[0], 0, 1);
         float chargeAgent = 0;
+        
+
         if (isHeuristic)
         {
             chargeAgent = actionChargement;
@@ -264,9 +294,11 @@ public class AlpinisteAgent : Agent
             chargeAgent = chargeMin + (chargeMax - chargeMin) * actionChargement;
             if (chargeAgent > chargeMin && moveX == 0)
             {
+                toucheSaut = true;
                 chargeSaut = chargeAgent;
                 sautEnChargement = false;
             }
+            else toucheSaut = false;
 
         }
 
@@ -279,56 +311,50 @@ public class AlpinisteAgent : Agent
         /**
          * RÉCOMPENSES
          */
-        //on veut calculer la récompense à donner en fonction de la distance de l'agent avec l'objectif
-        deltaObjectifAgent = (objectif.position - transform.position);//obtient un vecteur de delta position
-        float distanceObjectifAgent = (deltaObjectifAgent.y);
-        float recompenseDistance = 0;
-        float distanceInverse = distanceObjectifAgentMax - Mathf.Abs(distanceObjectifAgent);
+        float distanceObjectifAgent = deltaObjectifAgent.y;
 
-
-        if (distanceInverse > 0 && distanceInverse < distanceObjectifAgentMax )//pas de 0 ni de recompense >= 1 car réservé à l'atteinte de l'objectif
+        if ((hauteurMaxAtteinte - dHauteurMax) > rBody.position.y)//quand on descend trop bas de la hauteur max atteinte
         {
-            recompenseDistance = distanceInverse / distanceObjectifAgentMax;
-        } 
-        //penalité 
-        if (hauteurMaxAtteinte > rBody.position.y)
-        {
-            float deltaHP = hauteurMaxAtteinte - rBody.position.y;
-            //penalite += 5 * deltaHP / distanceObjectifAgentMax;
-        }
-        penalite += (float) 1 / MaxStep;
-        if (penalite >= 1f)
-        {
+            SetReward(-1f);
             recompense = -1f;
             EndEpisode();
         }
-        //on set la récompense à la bonne valeur
-        if (recompenseDistance < 1) setRecompense(recompenseDistance);//plus on s'approche de l'objectif plus la récompense est élevé
+        float recompensePalier = (float)palier / distanceObjectifAgentMax;
 
-
+        if (dernierPalier != palierActuel && distanceObjectifAgent != 0)
+        {
+            int palierParcouru = palierActuel - dernierPalier;//peut être négative 
+            ajouterRecompense(recompensePalier * palierParcouru);
+            dernierPalier = palierActuel;
+        }
+        if (MaxStep != 0) ajouterRecompense(-1f/MaxStep);
+        
 
 
     }
-    
+
     //pour changer le model
-    public void changerModel (ModelAsset model)
+    public void configurerModel(ModelAsset model)
     {
         SetModel("BehaviorAgentAlpiniste", model, InferenceDevice.Default);
-        var parametres = GetComponent<BehaviorParameters>();
-        parametres.BehaviorType = BehaviorType.InferenceOnly;
+        activerInference();
+
+
     }
+
     public void activerHeuristic()
     {
         var parametres = GetComponent<BehaviorParameters>();
         parametres.BehaviorType = BehaviorType.HeuristicOnly;
+        isHeuristic = true;
+        MaxStep = 0;
     }
     public void activerInference()
     {
-        enInference = true;
         var parametres = GetComponent<BehaviorParameters>();
         parametres.BehaviorType = BehaviorType.InferenceOnly;
-        MaxStep = 0;
-
+        isHeuristic = false;
+        MaxStep = 3000;
     }
 
 
@@ -345,7 +371,7 @@ public class AlpinisteAgent : Agent
         var continuousActionsOut = actionsOut.ContinuousActions;
         if (!sautEnChargement && chargeSaut > chargeMin)//permet de passer la charge qu'on a chargé
         {
-            continuousActionsOut[0] = chargeSaut;
+            continuousActionsOut[0] = (chargeSaut - chargeMin) / (chargeMax - chargeMin) ;
         }
         else
         {
@@ -355,16 +381,19 @@ public class AlpinisteAgent : Agent
 
     }
 
-    private void setRecompense(float recompense)
+    private void ajouterRecompense(float recompense)
     {
-        SetReward(recompense);
-        this.recompense = recompense;
-        //recompenseMax = Mathf.Max(recompenseMax, this.recompense );
+        AddReward(recompense);
+        this.recompense += recompense;
+        recompenseMax = Mathf.Max(recompenseMax, recompense);
+
         if (recompense <= -1f)
         {
             EndEpisode();
         }
     }
+
+
 
     private void calculDistanceMax()
     {
@@ -386,7 +415,9 @@ public class AlpinisteAgent : Agent
         {
             chargeSaut += Time.deltaTime;//on charge en fonction du temps de maintien
             chargeSaut = Mathf.Clamp(chargeSaut, chargeMin, chargeMax);
+            toucheSaut = true;
         }
+        else toucheSaut = false;
 
 
     }
@@ -428,11 +459,12 @@ public class AlpinisteAgent : Agent
                 recompenseObjectif = other.GetComponent<Objectif>().recompense;
             }
             SetReward(recompenseObjectif);
+            recompense = 1f;
             EndEpisode();
         }
         if (other.gameObject.name == "Bordure")
         {
-            setRecompense(-1f);
+            SetReward(-1f);
             EndEpisode();
         }
 
@@ -490,6 +522,24 @@ public class AlpinisteAgent : Agent
     {
         return recompense;
     }
+    public float getRecompenseMax() { return recompenseMax; }
+
+    public bool GetToucheG()
+    {
+        return toucheG;
+    }
+
+    public bool GetToucheD()
+    {
+        return toucheD;
+    }
+
+    public bool GetToucheSaut()
+    {
+        return toucheSaut;
+    }
+
+
     private float randomDebutX()
     {
         return UnityEngine.Random.Range(pos0, pos0 + largeurNiveau);

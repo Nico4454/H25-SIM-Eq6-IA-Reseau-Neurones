@@ -11,9 +11,11 @@ public class ChargementScene: MonoBehaviour
         SceneManager.LoadScene(scene);
     }
 
-    public void activerBoutonsCerveau()
+   
+    public void afficherElement(GameObject element)
     {
-        
+        element.SetActive(!element.activeInHierarchy);
     }
+
     
 }
