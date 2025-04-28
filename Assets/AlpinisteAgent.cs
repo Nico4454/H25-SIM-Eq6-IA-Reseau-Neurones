@@ -29,7 +29,7 @@ public class AlpinisteAgent : Agent
 
     private float recompenseMax = 0;
 
-    private float palier = 1f;
+    private float palier = 0.5f;
     private int dernierPalier = 0;
     private int palierActuel = 0;
     private int palierMax;
@@ -234,16 +234,21 @@ public class AlpinisteAgent : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        sensor.AddObservation(objectif.position - transform.position);//3
-        sensor.AddObservation(transform.position);
+        sensor.AddObservation(transform.position);//3 + 3
+        sensor.AddObservation(objectif.position);
         //ajouterObservationVecteurNormalise(sensor, transform.position);//2
+        //ajouterObservationVecteurNormalise(sensor, objectif.position);//2
 
-        //TOUS 1 OBSERVATION par ligne = 6
+
+        //TOUS 1 OBSERVATION par ligne = 5
         sensor.AddObservation(rBody.linearVelocityX / (forceSautMax * Mathf.Cos(angleSaut)));
         sensor.AddObservation(rBody.linearVelocityY / (forceSautMax * Mathf.Sin(angleSaut)));
+        //sensor.AddObservation(rBody.linearVelocityX);
+        //sensor.AddObservation(rBody.linearVelocityY);
+
         sensor.AddObservation(orientation);
-        sensor.AddObservation(IsPiedCollisionSol() ?  1:0);
-        sensor.AddObservation(palierActuel/palierMax);
+        sensor.AddObservation(decisionPossible);
+        sensor.AddObservation(enSaut);
 
 
     }
@@ -336,7 +341,7 @@ public class AlpinisteAgent : Agent
             ajouterRecompense(recompensePalier * palierParcouru);
             dernierPalier = palierActuel;
         }
-        //if (MaxStep != 0) ajouterRecompense(-1f/MaxStep);
+        if (MaxStep != 0) ajouterRecompense(-1f/MaxStep);
         
 
 
@@ -345,6 +350,7 @@ public class AlpinisteAgent : Agent
     //pour changer le model
     public void configurerModel(ModelAsset model)
     {
+        model.GetHashCode();
         SetModel("BehaviorAgentAlpiniste", model, InferenceDevice.Default);
         activerInference();
 
