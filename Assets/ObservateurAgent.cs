@@ -43,7 +43,7 @@ public class ObservateurAgent : MonoBehaviour
         texteEpisode.SetText("Épisodes: " + episode);
         texteSteps.SetText("Steps: " + stepsEpisode);
         texteRecompense.SetText("Récompenses: " + strRecompense);
-        texteRecompenseMax.SetText("max: " + recompenseMax.ToString("F3"));
+        texteRecompenseMax.SetText("Max: " + recompenseMax.ToString("F3"));
 
         if (recompense >= 1f) indicateur.color = Color.green;
         if (recompense <= -1f) indicateur.color = Color.red;

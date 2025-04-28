@@ -18,6 +18,7 @@ public class AlpinisteAgent : Agent
     private float departX;
     private float pos0 = -8f;
     private float largeurNiveau = 15f;
+    private float hauteurNiveau = 25f;
 
     //pour les récompenses :
     private float distanceObjectifAgentMax = 10;
@@ -56,6 +57,7 @@ public class AlpinisteAgent : Agent
 
     private float chargeSaut;
     private float forceSaut;
+    private float forceSautMax;
 
     private float angleSaut = 48.98f * Mathf.Deg2Rad; // deg converti en radians pour faciliter la visualisation
     private bool orientationVersGauche = false; // si agent orienté vers la gauche ou pas (la droite) pour définir le sens de l'angle
@@ -87,7 +89,7 @@ public class AlpinisteAgent : Agent
         rBody.sharedMaterial = matPasRebond;
         chargeSaut = chargeMin;
         dtRetourSol = dtRetourSolMin + 1;
-
+        forceSautMax = chargeMax * multiplicateurSaut;
     }
     private void FixedUpdate()
     {
@@ -232,18 +234,25 @@ public class AlpinisteAgent : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        sensor.AddObservation(transform.position);// 3 observations
-        sensor.AddObservation(objectif.position);// 3 observations
+        sensor.AddObservation(objectif.position - transform.position);//3
+        sensor.AddObservation(transform.position);
+        //ajouterObservationVecteurNormalise(sensor, transform.position);//2
 
-        sensor.AddObservation(rBody.linearVelocityX / (chargeMax * multiplicateurSaut * Mathf.Cos(angleSaut)));//2
-        sensor.AddObservation(rBody.linearVelocityY / (chargeMax * multiplicateurSaut * Mathf.Sin(angleSaut)));
-
+        //TOUS 1 OBSERVATION par ligne = 6
+        sensor.AddObservation(rBody.linearVelocityX / (forceSautMax * Mathf.Cos(angleSaut)));
+        sensor.AddObservation(rBody.linearVelocityY / (forceSautMax * Mathf.Sin(angleSaut)));
         sensor.AddObservation(orientation);
-        sensor.AddObservation(decisionPossible);
-        sensor.AddObservation(enSaut);
+        sensor.AddObservation(IsPiedCollisionSol() ?  1:0);
+        sensor.AddObservation(palierActuel/palierMax);
+
 
     }
-
+    //ajoute 2 observations normalisées pour la position dans le niveau
+    private void ajouterObservationVecteurNormalise(VectorSensor sensor, Vector3 position)
+    {
+        sensor.AddObservation(position.x / largeurNiveau);
+        sensor.AddObservation(position.y / hauteurNiveau);
+    }
 
     public override void OnActionReceived(ActionBuffers actions)
     {
@@ -327,7 +336,7 @@ public class AlpinisteAgent : Agent
             ajouterRecompense(recompensePalier * palierParcouru);
             dernierPalier = palierActuel;
         }
-        if (MaxStep != 0) ajouterRecompense(-1f/MaxStep);
+        //if (MaxStep != 0) ajouterRecompense(-1f/MaxStep);
         
 
 
@@ -460,6 +469,7 @@ public class AlpinisteAgent : Agent
             }
             SetReward(recompenseObjectif);
             recompense = 1f;
+            recompenseMax = recompenseObjectif;
             EndEpisode();
         }
         if (other.gameObject.name == "Bordure")
