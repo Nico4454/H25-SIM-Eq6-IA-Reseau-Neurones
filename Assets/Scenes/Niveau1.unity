@@ -19454,7 +19454,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7819552913340249626, guid: 6039877bf3a93834db772bd1a9f2805c, type: 3}
       propertyPath: m_BrainParameters.NumStackedVectorObservations
-      value: 5
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7819552913340249626, guid: 6039877bf3a93834db772bd1a9f2805c, type: 3}
       propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.size

@@ -327,12 +327,13 @@ public class AlpinisteAgent : Agent
          */
         float distanceObjectifAgent = deltaObjectifAgent.y;
 
-        if ((hauteurMaxAtteinte - dHauteurMax) > rBody.position.y)//quand on descend trop bas de la hauteur max atteinte
+        /** if ((hauteurMaxAtteinte - dHauteurMax) > rBody.position.y)//quand on descend trop bas de la hauteur max atteinte
         {
             SetReward(-1f);
             recompense = -1f;
             EndEpisode();
         }
+        */
         float recompensePalier = (float)palier / distanceObjectifAgentMax;
 
         if (dernierPalier != palierActuel && distanceObjectifAgent != 0)
