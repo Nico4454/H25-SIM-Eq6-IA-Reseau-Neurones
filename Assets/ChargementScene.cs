@@ -17,5 +17,10 @@ public class ChargementScene: MonoBehaviour
         element.SetActive(!element.activeInHierarchy);
     }
 
+    public void quitterJeu()
+    {
+        Application.Quit();
+    }
+
     
 }
