@@ -252,52 +252,16 @@ public class AlpinisteAgent : Agent
 
 
     }
-    //ajoute 2 observations normalisées pour la position dans le niveau
-    private void ajouterObservationVecteurNormalise(VectorSensor sensor, Vector3 position)
-    {
-        sensor.AddObservation(position.x / largeurNiveau);
-        sensor.AddObservation(position.y / hauteurNiveau);
-    }
 
     public override void OnActionReceived(ActionBuffers actions)
     {
-        
-
         float moveX = 0;
-        switch (actions.DiscreteActions[0])
-        {//donne la direction du mouvement en x
-            case 0:
-                {
-                    moveX = -1;
-                    toucheG = true;
-                    toucheD = false;
-                    break;
-                }
-            case 1: 
-                { 
-                    moveX = 0;
-                    toucheG = false;
-                    toucheD = false;
-                    break;
-                }
-            case 2:
-                {
-                    moveX = 1;
-                    toucheG = false;
-                    toucheD = true;
-                    break;
-                }
-        }
-        enMouvement = (moveX != 0);
+        moveX = deplacementAgent(actions, moveX);
 
-        if (!enSaut && !sautEnChargement)//si l'agent tombe sans avoir sauté il peut bougé
-        {
-            rBody.linearVelocityX = moveX * vitesseX;
-
-        }
+        //logique pour chargement du saut
         var actionChargement = ScaleAction(actions.ContinuousActions[0], 0, 1);
         float chargeAgent = 0;
-        
+
 
         if (isHeuristic)
         {
@@ -327,7 +291,8 @@ public class AlpinisteAgent : Agent
          */
         float distanceObjectifAgent = deltaObjectifAgent.y;
 
-        /** if ((hauteurMaxAtteinte - dHauteurMax) > rBody.position.y)//quand on descend trop bas de la hauteur max atteinte
+        /**
+        if ((hauteurMaxAtteinte - dHauteurMax) > rBody.position.y)//quand on descend trop bas de la hauteur max atteinte
         {
             SetReward(-1f);
             recompense = -1f;
@@ -342,10 +307,45 @@ public class AlpinisteAgent : Agent
             ajouterRecompense(recompensePalier * palierParcouru);
             dernierPalier = palierActuel;
         }
-        if (MaxStep != 0) ajouterRecompense(-1f/MaxStep);
-        
+        if (MaxStep != 0) ajouterRecompense(-1f / MaxStep);
 
 
+
+    }
+
+    private float deplacementAgent (ActionBuffers actions, float moveX)
+    {
+        switch (actions.DiscreteActions[0])
+        {//donne la direction du mouvement en x
+            case 0:
+                {
+                    moveX = -1;
+                    toucheG = true;
+                    toucheD = false;
+                    break;
+                }
+            case 1:
+                {
+                    moveX = 0;
+                    toucheG = false;
+                    toucheD = false;
+                    break;
+                }
+            case 2:
+                {
+                    moveX = 1;
+                    toucheG = false;
+                    toucheD = true;
+                    break;
+                }
+        }
+        enMouvement = (moveX != 0);
+        if (!enSaut && !sautEnChargement)//si l'agent tombe sans avoir sauté il peut bougé
+        {
+            rBody.linearVelocityX = moveX * vitesseX;
+
+        }
+        return moveX;
     }
 
     //pour changer le model
@@ -370,7 +370,7 @@ public class AlpinisteAgent : Agent
         var parametres = GetComponent<BehaviorParameters>();
         parametres.BehaviorType = BehaviorType.InferenceOnly;
         isHeuristic = false;
-        MaxStep = 3000;
+        MaxStep = 2000;
     }
 
 
