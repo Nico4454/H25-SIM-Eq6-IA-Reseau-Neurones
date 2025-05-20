@@ -383,8 +383,12 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\nMODE D'EMPLOI\n\nHeuristic = pour contr\xF4ler l'agent\n1 = le premier
-    cerveau *\n2 = le 2e cerveau *\n\n* va fonctionner tout seul\n\n"
+  m_text: "\nMODE D'EMPLOI\n\nHeuristic : contr\xF4le manuel de l'agent\n1 : cerveau
+    entrain\xE9 en 500 \xE9pisodes avec la config 5\n2 : cerveau entrain\xE9 en x00
+    \xE9pisodes avec la config 4\n\n\nInformations sur les menus :\n\xC9pisodes :
+    nombre d'essais \nSteps : nombre d'\xE9tapes dans l'essai\nR\xE9compenses : niveau
+    de r\xE9compense actuel\nmax : la r\xE9compense maximale atteinte durant tous
+    les essais\n\n\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -16963,7 +16967,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'recompense : 0,000'
+  m_text: "R\xE9compenses : 0,000"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -17254,7 +17258,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Step : 000'
+  m_text: 'Steps : 000'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -18362,7 +18366,7 @@ MonoBehaviour:
         m_MethodName: configurerModel
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 5022602860645237092, guid: 1fbb6383c8e9ef64887f8f629b7f3f45, type: 3}
+          m_ObjectArgument: {fileID: 5022602860645237092, guid: 8c613b5f2438fe94f81d68fc68fcc94c, type: 3}
           m_ObjectArgumentAssemblyTypeName: Unity.Sentis.ModelAsset, Unity.Sentis
           m_IntArgument: 2
           m_FloatArgument: 0
@@ -18520,7 +18524,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Episode : 000'
+  m_text: "\xC9pisodes : 000"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -18842,7 +18846,7 @@ MonoBehaviour:
         m_MethodName: configurerModel
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 5022602860645237092, guid: 1fbb6383c8e9ef64887f8f629b7f3f45, type: 3}
+          m_ObjectArgument: {fileID: 5022602860645237092, guid: 8c613b5f2438fe94f81d68fc68fcc94c, type: 3}
           m_ObjectArgumentAssemblyTypeName: Unity.Sentis.ModelAsset, Unity.Sentis
           m_IntArgument: 1
           m_FloatArgument: 0
