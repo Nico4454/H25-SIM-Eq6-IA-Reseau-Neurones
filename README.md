@@ -5,7 +5,17 @@ Par : Nicolas Gagné, Laurent Lepage, Jérôme Bruyère
 
 Hiver 2025 - SIM - Bdeb - Projet d'intégration
 
-Étapes pour faire fonctionner le projet :
+À propos :
+
+Ce projet consiste à la création d'une IA qui est capable d'apprendre par lui-même. Le projet-ci est le produit final qui permet d'experimenter avec les différents cerveaux pré-entrainés et aussi de manuellement contrôler l'alpiniste. 
+
+Librairie utilisée: Unity ML-agents toolkit
+
+2 éléments seron remis : 
+1- le code sur github ici
+2- le build du projet
+
+Étapes pour faire fonctionner le projet dans l'editor:
 1- Installer python 3.10.x
 
 2- Installer le repo pour ML-Agents 
