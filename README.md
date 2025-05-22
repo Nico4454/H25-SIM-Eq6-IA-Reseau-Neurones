@@ -12,7 +12,9 @@ Ce projet consiste à la création d'une IA qui est capable d'apprendre par lui-
 Librairie utilisée: Unity ML-agents toolkit
 
 2 éléments seron remis : 
+
 1- le code sur github ici
+
 2- le build du projet
 
 Étapes pour faire fonctionner le projet dans l'editor:
