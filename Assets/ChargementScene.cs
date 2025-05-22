@@ -1,14 +1,19 @@
 using System;
 using Unity.Sentis;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class ChargementScene: MonoBehaviour 
 {
-    public void charger(String scene)
+    public void charger(string scene)
     {
-        SceneManager.LoadScene(scene);
+        if (scene != null)
+        {
+            SceneManager.LoadScene(scene);
+        }
+        
     }
 
    
