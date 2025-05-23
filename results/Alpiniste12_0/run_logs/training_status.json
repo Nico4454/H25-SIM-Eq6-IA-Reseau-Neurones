@@ -1,0 +1,29 @@
+{
+    "BehaviorAgentAlpiniste": {
+        "checkpoints": [
+            {
+                "steps": 88251,
+                "file_path": "results\\Alpiniste12_0\\BehaviorAgentAlpiniste\\BehaviorAgentAlpiniste-88251.onnx",
+                "reward": null,
+                "creation_time": 1747759580.8868752,
+                "auxillary_file_paths": [
+                    "results\\Alpiniste12_0\\BehaviorAgentAlpiniste\\BehaviorAgentAlpiniste-88251.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 88251,
+            "file_path": "results\\Alpiniste12_0\\BehaviorAgentAlpiniste.onnx",
+            "reward": null,
+            "creation_time": 1747759580.8868752,
+            "auxillary_file_paths": [
+                "results\\Alpiniste12_0\\BehaviorAgentAlpiniste\\BehaviorAgentAlpiniste-88251.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.6.0+cpu"
+    }
+}

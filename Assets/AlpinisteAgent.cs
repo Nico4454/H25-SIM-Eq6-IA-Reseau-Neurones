@@ -93,6 +93,7 @@ public class AlpinisteAgent : Agent
     }
     private void FixedUpdate()
     {
+        //permet de prendre une décision lorsque conditions respectés : il peut faire une action seulement lorsqu'on lui permet la décision
         bool decisionPossible = (IsPiedCollisionSol() && rBody.linearVelocityY <= 0);
         if (decisionPossible)//quand au sol on demande une decision
         {
@@ -169,7 +170,7 @@ public class AlpinisteAgent : Agent
         }
 
 
-        if (isHeuristic)// effectue le chargement du saut seulement en heuristic
+        if (isHeuristic)// effectue le chargement du saut seulement en heuristic = controle manuel
         {
             float saut = 0;
             if (IsPiedCollisionSol() && isPretASauter())
@@ -211,7 +212,7 @@ public class AlpinisteAgent : Agent
 
     //GESTION DE L'AGENT CI-DESSOUS :
 
-    public override void OnEpisodeBegin()
+    public override void OnEpisodeBegin()//initialise au début de chaque épisode plusieurs paramêtres
     {
         recompense = 0;
         palierActuel = 0;
@@ -232,7 +233,7 @@ public class AlpinisteAgent : Agent
 
 
 
-    public override void CollectObservations(VectorSensor sensor)
+    public override void CollectObservations(VectorSensor sensor)//renvoie des observations à l'agent
     {
         sensor.AddObservation(transform.position);//3 + 3
         sensor.AddObservation(objectif.position);
@@ -263,7 +264,7 @@ public class AlpinisteAgent : Agent
         float chargeAgent = 0;
 
 
-        if (isHeuristic)
+        if (isHeuristic)//controle manuel
         {
             chargeAgent = actionChargement;
         }
@@ -280,7 +281,7 @@ public class AlpinisteAgent : Agent
 
         }
 
-        if (!enSaut && (chargeSaut > chargeMin) && !sautEnChargement)
+        if (!enSaut && (chargeSaut > chargeMin) && !sautEnChargement)//quand on est prêt à sauter, on saute
         {
             forceSaut = calculerForceSaut();
             sauter();
@@ -292,6 +293,8 @@ public class AlpinisteAgent : Agent
         float distanceObjectifAgent = deltaObjectifAgent.y;
 
         /**
+         * ici on a retiré le fait qu'on réninitialise l'agent quand il retombe trop bas 
+         * 
         if ((hauteurMaxAtteinte - dHauteurMax) > rBody.position.y)//quand on descend trop bas de la hauteur max atteinte
         {
             SetReward(-1f);
@@ -299,20 +302,22 @@ public class AlpinisteAgent : Agent
             EndEpisode();
         }
         */
-        float recompensePalier = (float)palier / distanceObjectifAgentMax;
 
+        float recompensePalier = (float)palier / distanceObjectifAgentMax;
+        //récompense par palier, donc comme ça lorsque l'agent change de palier, le palier actuel est compté et la récompense est relative au palier
         if (dernierPalier != palierActuel && distanceObjectifAgent != 0)
         {
             int palierParcouru = palierActuel - dernierPalier;//peut être négative 
             ajouterRecompense(recompensePalier * palierParcouru);
             dernierPalier = palierActuel;
         }
-        if (MaxStep != 0) ajouterRecompense(-1f / MaxStep);
+        if (MaxStep != 0) ajouterRecompense(-1f / MaxStep);//on puni l'agent si il prend trop de temps (chaque step)
 
 
 
     }
 
+    //méthode de déplacement en x seulement avec 3 actions possibles (rien, gauche, droite)
     private float deplacementAgent (ActionBuffers actions, float moveX)
     {
         switch (actions.DiscreteActions[0])

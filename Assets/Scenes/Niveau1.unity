@@ -18367,7 +18367,7 @@ MonoBehaviour:
         m_MethodName: configurerModel
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 5022602860645237092, guid: 8c613b5f2438fe94f81d68fc68fcc94c, type: 3}
+          m_ObjectArgument: {fileID: 5022602860645237092, guid: 382fd7706a53e944783fb3695866dc1c, type: 3}
           m_ObjectArgumentAssemblyTypeName: Unity.Sentis.ModelAsset, Unity.Sentis
           m_IntArgument: 2
           m_FloatArgument: 0
@@ -18560,7 +18560,7 @@ GameObject:
   - component: {fileID: 1639370110}
   - component: {fileID: 1639370109}
   m_Layer: 0
-  m_Name: Panneau
+  m_Name: Panneau donnee
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
